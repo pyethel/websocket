@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>groupChat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/mine.css" rel="stylesheet">
+    <link href="css/chat.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/chat.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // 初始化websocket
+            CHAT.init();
+            // 获取聊天记录
+            var me = app.getUserGlobalInfo();
+            var group = app.getGroupInfo();
+            $("#groupName").text(group.groupName);
+            $.ajax({
+                type: "post",
+                url: "/GroupChatHistory",
+                data: {
+                    receiverId: group.groupId,
+                    msgType: app.GROUP
+                },
+                success: function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].senderId === me.userId && data[i].receiverId === group.groupId && data[i].type === app.GROUP)
+                            sendMsg(data[i]);
+                        else if (data[i].senderId !== me.userId && data[i].receiverId === group.groupId && data[i].type === app.GROUP) {
+                            receiveMsg(data[i]);
+                        }
+                    }
+                }
+            });
+        });
+            //渲染发送的消息
+            function sendMsg(chatMsg){
+                var addTab ="<div class=\"me_lists\">\n" +
+                    "\t\t\t\t<div class=\"media mt-3\">\n" +
+                    "\t\t\t\t\t<div class=\"media-body ml-3 text-right\">\n" +
+                    "\t\t\t\t\t\t<div class=\"card my-card\">\n" +
+                    "\t\t\t\t\t\t\t<div class=\"card-title t1 mr-2\">"+ chatMsg.senderName +"</div>\n" +
+                    "\t\t\t\t\t\t\t<div class=\"card-text t2 mr-2\">" + chatMsg.msg + "</div>\n" +
+                    "\t\t\t\t\t\t\t<div class=\"footer t3 mr-2\">"+chatMsg.localDateTime+"</div>\n" +
+                    "\t\t\t\t\t\t</div>\n" +
+                    "\t\t\t\t\t</div>\n" +
+                    "\t\t\t\t\t<img class=\"mr-2 ml-2 header-pic\" alt=\"image\" src=\""+ chatMsg.senderPic +"\">\n" +
+                    "\t\t\t\t</div>\n" +
+                    "\t\t\t</div>";
+                $("#responseContent").append(addTab);
+            }
+            //渲染接收到的信息
+            function receiveMsg(chatMsg){
+                var addTab ="<div class=\"friend_lists\">\n" +
+                    "\t\t\t\t<div class=\"media mt-3\">\n" +
+                    "\t\t\t\t\t<img class=\"mr-2 ml-2 header-pic\" alt=\"image\" src=\""+ chatMsg.senderPic +"\">\n" +
+                    "\t\t\t\t\t<div class=\"media-body mr-3 text-left\">\n" +
+                    "\t\t\t\t\t\t<div class=\"card\">\n" +
+                    "\t\t\t\t\t\t\t<div class=\"card-title t1 ml-2\">"+ chatMsg.senderName +"</div>\n" +
+                    "\t\t\t\t\t\t\t<div class=\"card-text t2 ml-2\">"+ chatMsg.msg +"</div>\n" +
+                    "\t\t\t\t\t\t\t<div class=\"footer t3 ml-2\">"+ chatMsg.localDateTime+ "</div>\n" +
+                    "\t\t\t\t\t\t</div>\n" +
+                    "\t\t\t\t\t</div>\n" +
+                    "\t\t\t\t</div>\n" +
+                    "\t\t\t</div>";
+
+                $("#responseContent").append(addTab);
+            }
+            //构建聊天业务CHAT
+            window.CHAT={
+                socket : null,
+                init:function () {
+                    if(window.WebSocket){
+                        if(CHAT.socket != null&&CHAT.socket.readyState===WebSocket.OPEN) {
+                            return false;
+                        }
+                        CHAT.socket = new WebSocket("ws://localhost:8889/ws");
+                        CHAT.socket.onopen = function(){
+                            console.log("open");
+                            var me = app.getUserGlobalInfo();
+                            var group = app.getGroupInfo();
+                            var chatMsg = new app.ChatMsg(null, me.userId, me.userName, me.picture, group.groupId,null,null,app.CONNECT, app.GROUP);
+                            CHAT.chat(JSON.stringify(chatMsg));
+
+                        };
+                        CHAT.socket.onclose =function() {
+                            console.log("close")
+                        };
+                        CHAT.socket.onerror = function() {
+                            console.log("error")
+                        };
+                        CHAT.socket.onmessage = function(e){
+                            var me = app.getUserGlobalInfo();
+                            var group = app.getGroupInfo();
+                            var chatMsg = JSON.parse(e.data);
+                            if(chatMsg.senderId === me.userId && chatMsg.receiverId === group.groupId && chatMsg.type=== app.GROUP)
+                            {
+                                sendMsg(chatMsg);
+                            }
+                            else if(chatMsg.senderId !== me.userId && chatMsg.receiverId === group.groupId && chatMsg.type === app.GROUP) {
+                                receiveMsg(chatMsg);
+                            }
+                        }
+                    }
+                    else{
+                        alert("浏览器不支持websocket");
+                    }
+                },
+                chat:function (msg) {
+                    if(CHAT.socket != null&&CHAT.socket.readyState===WebSocket.OPEN) {
+                        CHAT.socket.send(msg);
+                    }else{
+                        CHAT.init();
+                    }
+                }};
+            function sendNetty(){
+                var me = app.getUserGlobalInfo();
+                var group = app.getGroupInfo();
+                var m = $("#input-message");
+                var msgTextVal = m.val();
+                m.val("");
+                var chatMsg = new app.ChatMsg(null, me.userId, me.userName, me.picture, group.groupId, null, msgTextVal,app.CHAT, app.GROUP);
+                CHAT.chat(JSON.stringify(chatMsg));
+            }
+    </script>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #e3f2fd;">
+        <a class="navbar-brand" href="#" id="groupName"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="FriendList">好友列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="GroupList">群聊列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="AddFriend">添加好友</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="AddGroup">添加群聊</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="UpdateInfo">更新信息</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">退出登录</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!--		 导航-->
+    <div class="chat-body" id="responseContent">
+
+    </div>
+
+
+    <nav class="navbar navbar-light fixed-bottom " style="background-color: #e3f2fd;">
+        <form class="ml-2 mr-2" onsubmit="return false;">
+            <label>
+                <input id="input-message" class="form-control" placeholder="请输入消息" type="text" name="message" value="">
+            </label>
+            <button class="btn btn-success" id="send" onclick="sendNetty()">发送消息</button>
+        </form>
+    </nav>
+</div>
+</body>
+</html>

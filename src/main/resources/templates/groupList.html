@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="CN">
+
+<head>
+    <title>Group</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/mine.css" rel="stylesheet">
+    <link href="css/icon.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/chat.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            CHAT.init();
+            var me = app.getUserGlobalInfo();
+            $("#user-name").text(me.userName+"群聊列表");
+            $.ajax({
+                type: "POST",
+                url: "/groupList",
+                timeout: 10000,
+                data: {
+                    userId: me.userId
+                },
+                success: function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var groupHtml =
+                            "<div class=\"media mt-3\">" +
+                            "<img class=\"mr-4 ml-4 friend_pic\" alt=\"Generic placeholder image\" src=\"" + data[i].groupPic + "\">\n" +
+                            "<div class=\"media-body mr-4\">\n" +
+                            "<h6 class=\"mt-1 mb-2\">" + data[i].groupName + "</h6>\n" +
+                            "<div id=\""+data[i].groupId+"\">\n"+
+                            "</div>\n"+
+                            "</div>\n" +
+                            "<button class=\"btn\" onclick=\"groupChat(" + data[i].groupId +","+me.userId+ ");\">发送信息</button>\n" +
+                            "</div>";
+                        var groupList = $("#groupList");
+                        groupList.append(groupHtml);
+                    }
+                },
+                error: function () {
+                    alert("error");
+                }
+            })
+        });
+        //构建聊天业务CHAT
+        window.CHAT = {
+            socket: null,
+            init: function () {
+                var me = app.getUserGlobalInfo();
+                if (window.WebSocket) {
+                    if (CHAT.socket != null && CHAT.socket.readyState === WebSocket.OPEN) {
+                        return false;
+                    }
+                    CHAT.socket = new WebSocket("ws://localhost:8889/ws");
+                    CHAT.socket.onopen = function () {
+                        console.log("open");
+                        var chatMsg = new app.ChatMsg(null, me.userId, null, null, null, null, null, app.CONNECT, app.GROUP);
+                        CHAT.chat(JSON.stringify(chatMsg));
+                    };
+                    CHAT.socket.onmessage = function (e) {
+                        var chatMsg = JSON.parse(e.data);
+                        if (chatMsg.senderId !== me.userId && chatMsg.type === app.GROUP) {
+                            receiveMsg(chatMsg);
+                        }
+                    }
+                } else {
+                    alert("浏览器不支持websocket");
+                }
+            },
+            chat:function (msg) {
+                if(CHAT.socket != null&&CHAT.socket.readyState===WebSocket.OPEN) {
+                    CHAT.socket.send(msg);
+                }else{
+                    CHAT.init();
+                }
+            }
+        };
+        function receiveMsg(chatMsg) {
+            var id = chatMsg.senderId;
+            $("#"+id).html("<div>" +
+                "<a class=\"iconfont icon-xiaoxi\">有新消息</a>" +
+                "</div>");
+        }
+    </script>
+</head>
+
+<body>
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #e3f2fd;">
+        <a class="navbar-brand user-name" id="user-name" href="#">userName</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/FriendList">好友列表</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/GroupList">群聊列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/AddFriend">添加好友</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/AddGroup">添加群聊</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/UpdateInfo">更新信息</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">退出登录</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!--		 导航-->
+    <div id="groupList">
+    </div>
+
+</div>
+</body>
+<script>
+    function groupChat(groupId, senderId){
+        $.ajax({
+           type: "post",
+           url: "/getGroupInfo",
+           data: {
+               groupId: groupId,
+           },
+            success: function (data) {
+               app.setGroupInfo(data);
+            }
+
+        });
+        $.ajax({
+            type: "post",
+            url: "/getGroupMemberInfo",
+            data: {
+                groupId: groupId,
+                senderId: senderId
+            },
+            success: function (data) {
+                app.setFriendInfo(data);
+            }
+        });
+        location.href="/GroupChat";
+    }
+</script>
+
+</html>

@@ -1,0 +1,24 @@
+.portrait{
+	width: 60px;
+	height: 60px;
+}
+.col-centered{
+	float:none;
+	margin:0 auto;
+}
+.friend-card{
+	width:95%;
+	height:60px;
+}
+.blank{
+	height: 15px;
+	width: 95%;
+}
+.friend_pic{
+	width: 70px;
+	height: 70px;
+}
+body{
+	padding-top:50px;
+	padding-bottom:80px;
+}

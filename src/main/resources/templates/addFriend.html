@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="CN">
+<head>
+    <meta charset="UTF-8">
+    <title>AddFriend</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/mine.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/chat.js"></script>
+    <script>
+        $(function () {
+            var me = app.getUserGlobalInfo();
+            $("#userName").text(me.userName);
+        })
+    </script>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #e3f2fd;">
+        <a class="navbar-brand" href="#" id="userName">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/FriendList">好友列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/GroupList">群聊列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/AddFriend">添加好友</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/AddGroup">添加群聊</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/UpdateInfo">更新信息</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">退出登录</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!--		 导航-->
+
+    <div id="main-body">
+        <div class="input-group mb-3 mt-3">
+            <input type="text" class="form-control" id="friendName" placeholder="friend username" aria-label="friend username" aria-describedby="basic-addon2">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" id="searchButton" onclick="search()" type="button">搜索</button>
+            </div>
+        </div>
+
+<!--        <div class="media mt-3">-->
+<!--            <img class="mr-4 ml-4 friend_pic" alt="image" src="images/3.jpg">-->
+<!--            <div class="media-body mr-4">-->
+<!--                <h6 class="mt-1 mb-2">userName</h6>-->
+<!--            </div>-->
+<!--        </div>-->
+
+    </div>
+</div>
+
+</body>
+<script>
+    function search() {
+        var me = app.getUserGlobalInfo();
+        var friendName = $("#friendName").val();
+        if(friendName==='')
+            return false;
+        $.ajax({
+            type: "post",
+            url: "/searchFriend",
+            data: {
+                meId: me.userId,
+                friendName: friendName
+            },
+            success: function(data){
+                var friend = $("#main-body");
+                for(var i=0; i<data.length;i++){
+                    var friendHtml =
+                        "<div class=\"media mt-3\">\n" +
+                        "            <img class=\"mr-4 ml-4 friend_pic\" alt=\"image\" src=\""+data[i].picture+"\">\n" +
+                        "            <div class=\"media-body mr-4\">\n" +
+                        "                <h6 class=\"mt-1 mb-2\">"+data[i].userName +"</h6>\n" +
+                        "            </div>\n" +
+                        "<button class=\"btn\" onclick=\"addFriend("+data[i].userId+");\">添加好友</button>\n"+
+                        "        </div>";
+                    friend.append(friendHtml);
+                }
+            },
+            error: function () {
+                alert("error")
+            }
+        })
+    }
+    function addFriend(friendId) {
+        var me = app.getUserGlobalInfo();
+        $.ajax({
+            type: "post",
+            url: "/friendAdd",
+            data:{
+                friendId: friendId,
+                userId: me.userId
+            },
+            success: function () {
+                alert("添加好友成功！");
+                location.href = "/AddFriend"
+            }
+        })
+    }
+</script>
+</html>

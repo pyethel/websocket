@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta name="author" content="Kodinger">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>My Register Page</title>
+	<link th:href="@{css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{css/my-login.css}" rel="stylesheet">
+</head>
+<body class="my-login-page">
+	<section class="h-100">
+		<div class="container h-100">
+			<div class="row justify-content-md-center h-100">
+				<div class="card-wrapper">
+					<div class="card fat">
+						<div class="card-body">
+							<h4 class="card-title">注册</h4>
+							<form method="POST" class="my-login-validation" action="/doRegister">
+
+								<div class="form-group">
+									<label for="userName">账号</label>
+									<input id="userName" type="text" class="form-control" name="userName" required>
+								</div>
+
+								<div class="form-group">
+									<label for="password">密码</label>
+									<input id="password" type="password" class="form-control" name="password" required data-eye>
+								</div>
+
+								<div class="form-group m-0">
+									<button type="submit" class="btn btn-primary btn-block">
+										注册
+									</button>
+								</div>
+								<div class="mt-2 text-center" th:text="${error}">
+
+								</div>
+								<div class="mt-4 text-center">
+									已经有一个账户<a href="/login"> 立即登录</a>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<script th:src="@{js/jquery.min.js}"></script>
+	<script th:src="@{js/bootstrap.min.js}"></script>
+</body>
+</html>
