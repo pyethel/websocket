@@ -13,4 +13,5 @@ public interface GroupDao extends JpaRepository<Group, Integer> {
     @Query(value = "select * from groups g where g.group_name like CONCAT('%',:groupName,'%')", nativeQuery = true)
     List<Group> findGroupListByGroupName(@Param("groupName") String groupName);
 
+    Group findByGroupName(String groupName);
 }

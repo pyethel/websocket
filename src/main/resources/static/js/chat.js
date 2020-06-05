@@ -1,33 +1,3 @@
-// function getUserInfo() {
-//     var username, userPic, userId;
-//     $.ajax({
-//         type : 'POST',
-//         url : '/getUserInfo',
-//         dataType: 'json',
-//         async : false,
-//         success: function(user){
-//             username = user.userName;
-//             userPic = user.userPic;
-//             userId = user.userId;
-//         }
-//     });
-//     return [userId, username, userPic];
-// }
-//
-// function getFriendInfo(friendId) {
-//     var friendName, friendPic;
-//     $.ajax({
-//         type : 'POST',
-//         url : '/getFriendInfo?friendId='+friendId,
-//         dataType: 'json',
-//         async : false,
-//         success: function(friend){
-//             friendName = friend.userName;
-//             friendPic = friend.picture;
-//         }
-//     });
-//     return [friendName, friendPic];
-// }
 app={
     CONNECT: 1,
     CHAT: 2,

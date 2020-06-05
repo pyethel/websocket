@@ -33,4 +33,8 @@ public class GroupServiceImpl {
     public Group saveGroup(Group g){
         return groupDao.save(g);
     }
+
+    public Group findByGroupName(String groupName){
+        return groupDao.findByGroupName(groupName);
+    }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -46,14 +47,29 @@ public class InfoController {
     }
     @RequestMapping("/createGroup")
     @ResponseBody
-    public String createGroup(String groupName, Integer meId){
+    public String createGroup(String groupName, Integer meId, String checkboxes){
+        String[] ids=checkboxes.split(",");
+        List<Integer> intIds=new ArrayList<>();
+        for(String i:ids)
+        {
+            intIds.add(Integer.valueOf(i));
+        }
         Group g = new Group();
-        g.setGroupName(groupName);
-        g.setGroupOwnerId(meId);
-        g.setGroupPic("images/group/2.jpg");
-        Integer gId = groupService.saveGroup(g).getGroupId();
-        groupRelService.saveGroupRel(gId, meId);
-        return "创建成功";
+        Group group = groupService.findByGroupName(groupName);
+        if(group==null){
+            g.setGroupName(groupName);
+            g.setGroupOwnerId(meId);
+            g.setGroupPic("images/group/2.jpg");
+            Integer gId = groupService.saveGroup(g).getGroupId();
+            groupRelService.saveGroupRel(gId, meId);
+            for(Integer id: intIds){
+                groupRelService.saveGroupRel(gId,id);
+            }
+            return "创建成功";
+        }
+        else{
+            return "群名称已存在，创建失败";
+        }
     }
     @RequestMapping("/searchGroup")
     @ResponseBody

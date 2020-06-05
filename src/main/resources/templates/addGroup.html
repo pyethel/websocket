@@ -11,8 +11,27 @@
     <script src="js/chat.js"></script>
     <script>
         $(function () {
-            var me = app.getUserGlobalInfo();
+            const me = app.getUserGlobalInfo();
             $("#userName").text(me.userName);
+            $.ajax({
+                url:"/friendList",
+                type:"POST",
+                data:{
+                    userId:me.userId
+                },
+                success:(res)=>{
+                    let friends = $("#friends");
+                    for(let i=0;i<res.length;i++)
+                    {
+                        let friendHtml ="<div class=\"form-check form-check-inline\">\n" +
+                            "  <input class=\"form-check-input\" type=\"checkbox\" name=\"inlineCheckboxOptions\" id=\"inlineCheckbox"+res[i].userId+"\" value=\""+res[i].userId+"\">\n" +
+                            "  <label class=\"form-check-label\" for=\"inlineCheckbox"+res[i].userId+"\">"+res[i].userName+"</label>\n" +
+                            "</div>";
+                        friends.append(friendHtml);
+                    }
+                }
+
+            });
         })
     </script>
 </head>
@@ -59,12 +78,17 @@
             </div>
         </div>
         <div id="create-body">
-            <div class="input-group mb-3 mt-3">
-                <input type="text" class="form-control" id="createGroupName" placeholder="create group name" aria-label="create group name" aria-describedby="basic-addon2">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" id="createButton" onclick="create()" type="button">创建</button>
+            <form>
+                <div class="input-group mb-3 mt-3">
+                    <input type="text" class="form-control" id="createGroupName" placeholder="create group name" aria-label="create group name" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" id="createButton" onclick="create()" type="button">创建</button>
+                    </div>
                 </div>
-            </div>
+                <div id="friends">
+
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -75,15 +99,21 @@
         const me = app.getUserGlobalInfo();
         if(groupName==='')
             return false;
+        let checkboxes=[];
+        $("input[name='inlineCheckboxOptions']:checked").each(function(i){
+            checkboxes[i] = $(this).val();
+        });
         $.ajax({
             type:"post",
             url:"/createGroup",
+            traditional:true,
             data:{
+                checkboxes:checkboxes,
                 meId: me.userId,
                 groupName: groupName
             },
-            success:function () {
-                alert("创建群聊成功");
+            success:res=>{
+                alert(res);
             }
 
         })

@@ -15,8 +15,8 @@
             // 初始化websocket
             CHAT.init();
             // 获取聊天记录
-            var me = app.getUserGlobalInfo();
-            var group = app.getGroupInfo();
+            const me = app.getUserGlobalInfo();
+            const group = app.getGroupInfo();
             $("#groupName").text(group.groupName);
             $.ajax({
                 type: "post",
@@ -26,7 +26,7 @@
                     msgType: app.GROUP
                 },
                 success: function (data) {
-                    for (var i = 0; i < data.length; i++) {
+                    for (let i = 0; i < data.length; i++) {
                         if (data[i].senderId === me.userId && data[i].receiverId === group.groupId && data[i].type === app.GROUP)
                             sendMsg(data[i]);
                         else if (data[i].senderId !== me.userId && data[i].receiverId === group.groupId && data[i].type === app.GROUP) {
@@ -117,12 +117,12 @@
                     }
                 }};
             function sendNetty(){
-                var me = app.getUserGlobalInfo();
-                var group = app.getGroupInfo();
-                var m = $("#input-message");
-                var msgTextVal = m.val();
+                const me = app.getUserGlobalInfo();
+                const group = app.getGroupInfo();
+                let m = $("#input-message");
+                let msgTextVal = m.val();
                 m.val("");
-                var chatMsg = new app.ChatMsg(null, me.userId, me.userName, me.picture, group.groupId, null, msgTextVal,app.CHAT, app.GROUP);
+                const chatMsg = new app.ChatMsg(null, me.userId, me.userName, me.picture, group.groupId, null, msgTextVal,app.CHAT, app.GROUP);
                 CHAT.chat(JSON.stringify(chatMsg));
             }
     </script>
