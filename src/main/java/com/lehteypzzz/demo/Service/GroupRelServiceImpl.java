@@ -45,4 +45,8 @@ public class GroupRelServiceImpl {
         g.setGroupMemberId(userId);
         return groupRelDao.save(g);
     }
+    public void deleteOne(Integer groupId, Integer meId){
+        GroupRel g = groupRelDao.findByGroupIdAndGroupMemberId(groupId, meId);
+        groupRelDao.delete(g);
+    }
 }

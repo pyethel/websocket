@@ -43,9 +43,18 @@ public class InfoController {
         queryUsers.removeIf(user -> user == me);
         queryUsers.removeAll(myFriends);
         return queryUsers;
-
     }
-
+    @RequestMapping("/createGroup")
+    @ResponseBody
+    public String createGroup(String groupName, Integer meId){
+        Group g = new Group();
+        g.setGroupName(groupName);
+        g.setGroupOwnerId(meId);
+        g.setGroupPic("images/group/2.jpg");
+        Integer gId = groupService.saveGroup(g).getGroupId();
+        groupRelService.saveGroupRel(gId, meId);
+        return "创建成功";
+    }
     @RequestMapping("/searchGroup")
     @ResponseBody
     public List<Group> searchGroup(String groupName, Integer meId){
@@ -62,11 +71,25 @@ public class InfoController {
         friendshipService.saveOne(friendId, userId);
         return "添加好友成功";
     }
+    @RequestMapping("/deleteFriend")
+    @ResponseBody
+    public String deleteFriend(Integer friendId, Integer meId){
+        friendshipService.deleteOne(friendId,meId);
+        return "";
+    }
 
     @RequestMapping("/GroupAdd")
     @ResponseBody
     public GroupRel addGroup(Integer groupId, Integer userId){
         return groupRelService.saveGroupRel(groupId, userId);
+    }
+
+
+    @RequestMapping("/deleteGroup")
+    @ResponseBody
+    public String deleteGroup(Integer groupId, Integer meId){
+        groupRelService.deleteOne(groupId, meId);
+        return "";
     }
 
     @RequestMapping("updateUserInfo")

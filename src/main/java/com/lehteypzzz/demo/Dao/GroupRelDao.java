@@ -8,5 +8,5 @@ import java.util.List;
 public interface GroupRelDao extends JpaRepository<GroupRel, Integer> {
     List<GroupRel> findAllByGroupMemberId(Integer userId);
     List<GroupRel> findAllByGroupId(Integer groupId);
-
+    GroupRel findByGroupIdAndGroupMemberId(Integer groupId, Integer meId);
 }

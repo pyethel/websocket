@@ -29,4 +29,8 @@ public class GroupServiceImpl {
     public List<Group> getGroupListByGroupName(String groupName){
         return groupDao.findGroupListByGroupName(groupName);
     }
+
+    public Group saveGroup(Group g){
+        return groupDao.save(g);
+    }
 }

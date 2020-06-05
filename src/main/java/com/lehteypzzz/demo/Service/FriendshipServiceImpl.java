@@ -30,5 +30,10 @@ public class FriendshipServiceImpl {
         friendship.setFriendId(friendId);
         friendshipDao.save(friendship);
     }
-
+    public void deleteOne(Integer friendId, Integer userId){
+        Friendship rel1 = friendshipDao.findByFriendIdAndUserId(friendId, userId);
+        Friendship rel2 = friendshipDao.findByFriendIdAndUserId(userId, friendId);
+        friendshipDao.delete(rel1);
+        friendshipDao.delete(rel2);
+    }
 }

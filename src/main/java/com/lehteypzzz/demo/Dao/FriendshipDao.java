@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface FriendshipDao extends JpaRepository<Friendship, Integer> {
     List<Friendship> findAllByUserId(Integer userId);
+
+    Friendship findByFriendIdAndUserId(Integer friendId, Integer userId);
 }

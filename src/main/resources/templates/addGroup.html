@@ -51,20 +51,46 @@
 
     <div id="main-body">
         <div id="search-body">
-        <div class="input-group mb-3 mt-3">
-            <input type="text" class="form-control" id="groupName" placeholder="group name" aria-label="group name" aria-describedby="basic-addon2">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" id="searchButton" onclick="search()" type="button">搜索</button>
+            <div class="input-group mb-3 mt-3">
+                <input type="text" class="form-control" id="searchGroupName" placeholder="search group name" aria-label="search group name" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" id="searchButton" onclick="search()" type="button">搜索</button>
+                </div>
             </div>
         </div>
+        <div id="create-body">
+            <div class="input-group mb-3 mt-3">
+                <input type="text" class="form-control" id="createGroupName" placeholder="create group name" aria-label="create group name" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" id="createButton" onclick="create()" type="button">创建</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 </body>
 <script>
+    function create() {
+        const groupName = $("#createGroupName").val();
+        const me = app.getUserGlobalInfo();
+        if(groupName==='')
+            return false;
+        $.ajax({
+            type:"post",
+            url:"/createGroup",
+            data:{
+                meId: me.userId,
+                groupName: groupName
+            },
+            success:function () {
+                alert("创建群聊成功");
+            }
+
+        })
+    }
     function search() {
-        var groupName = $("#groupName").val();
-        var me = app.getUserGlobalInfo();
+        const groupName = $("#searchGroupName").val();
+        const me = app.getUserGlobalInfo();
         if(groupName==='')
             return false;
         $.ajax({
@@ -75,9 +101,9 @@
                 groupName: groupName
             },
             success: function (data) {
-                var body = $("#search-body");
-                for (var i = 0; i < data.length; i++) {
-                    var groupHtml =
+                const body = $("#search-body");
+                for (let i = 0; i < data.length; i++) {
+                    let groupHtml =
                         "<div class=\"media mt-3\">\n" +
                         "            <img class=\"mr-4 ml-4 friend_pic\" alt=\"image\" src=\"" + data[i].groupPic + "\">\n" +
                         "            <div class=\"media-body mr-4\">\n" +
@@ -91,7 +117,7 @@
         });
     }
     function addGroup(groupId) {
-        var me =app.getUserGlobalInfo();
+        const me =app.getUserGlobalInfo();
         $.ajax({
             type: "post",
             url: "/GroupAdd",

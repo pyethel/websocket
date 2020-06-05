@@ -14,7 +14,7 @@
 	<script type="text/javascript">
 		$(function () {
 			CHAT.init();
-			var me = app.getUserGlobalInfo();
+			const me = app.getUserGlobalInfo();
 			$("#user-name").text(me.userName + "好友列表");
 			$.ajax({
 				type: "POST",
@@ -23,13 +23,13 @@
 					userId: me.userId
 				},
 				success: function (data) {
-					for (var i = 0; i < data.length; i++) {
-						var state;
+					for (let i = 0; i < data.length; i++) {
+						let state;
 						if (data[i].isOnline === app.ONLINE)
 							state = "(在线)";
 						else
 							state = "(离线)";
-						var friendHtml =
+						let friendHtml =
 								"<div class=\"media mt-3\">" +
 								"<img class=\"mr-4 ml-4 friend_pic\" alt=\"Generic placeholder image\" src=\"" + data[i].picture + "\">\n" +
 								"<div class=\"media-body mr-4\">\n" +
@@ -37,9 +37,10 @@
 								"<div id=\""+data[i].userId+"\">\n"+
 								"</div>\n"+
 								"</div>\n" +
-								"<button class=\"btn\" onclick=\"singleChat(" + data[i].userId + "," + me.userId + ");\">发送信息</button>\n" +
+								"<button class=\"btn\" onclick=\"singleChat(" + data[i].userId + ");\">发送</button>\n" +
+								"<button class=\"btn\" onclick=\"deleteFriend(" + data[i].userId + "," + me.userId + ");\">删除</button>\n" +
 								"</div>";
-						var friendList = $("#friendList");
+						let friendList = $("#friendList");
 						friendList.append(friendHtml);
 					}
 				},
@@ -52,18 +53,18 @@
 			window.CHAT = {
 				socket: null,
 				init: function () {
-					var me = app.getUserGlobalInfo();
+					const me = app.getUserGlobalInfo();
 					if (window.WebSocket) {
 						if (CHAT.socket != null && CHAT.socket.readyState === WebSocket.OPEN) {
 							return false;
 						}
 						CHAT.socket = new WebSocket("ws://localhost:8889/ws");
 						CHAT.socket.onopen = function () {
-							var chatMsg = new app.ChatMsg(null, me.userId, null, null, null, null, null, app.CONNECT, app.SINGLE);
+							const chatMsg = new app.ChatMsg(null, me.userId, null, null, null, null, null, app.CONNECT, app.SINGLE);
 							CHAT.chat(JSON.stringify(chatMsg));
 						};
 						CHAT.socket.onmessage = function (e) {
-							var chatMsg = JSON.parse(e.data);
+							const chatMsg = JSON.parse(e.data);
 							if (chatMsg.receiverId === me.userId && chatMsg.type === app.SINGLE) {
 								receiveMsg(chatMsg);
 							}
@@ -81,7 +82,7 @@
 				}
 			};
 			function receiveMsg(chatMsg) {
-				var id = chatMsg.senderId;
+				const id = chatMsg.senderId;
 				$("#"+id).html("<div>" +
 						"<a class=\"iconfont icon-xiaoxi\">有新消息</a>" +
 						"</div>");
@@ -93,7 +94,6 @@
 <div class="container">
 	<nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #e3f2fd;">
 		<a class="navbar-brand user-name" id="user-name" href="#">
-			<img src="">
 		</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
@@ -138,9 +138,23 @@
 			},
 			success: function (data) {
 				app.setFriendInfo(data);
-				location.href="SingleChat";
+				location.href="/SingleChat";
 			}
 		});
+	}
+	function deleteFriend(friendId,meId){
+		$.ajax({
+			type: "POST",
+			url:"/deleteFriend",
+			data:{
+				friendId,
+				meId
+			},
+			success:()=>{
+				alert("删除好友成功");
+				location.href="/FriendList";
+			}
+		})
 	}
 </script>
 </html>
