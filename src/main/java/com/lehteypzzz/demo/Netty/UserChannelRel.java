@@ -8,7 +8,7 @@ import java.util.HashMap;
  * @Description: 用户id和channel的关联关系处理
  */
 public class UserChannelRel {
-    private static HashMap<Integer, Channel> manager = new HashMap<>();
+    private static final HashMap<Integer, Channel> manager = new HashMap<>();
     public static void put(Integer sendId, Channel channel){
         manager.put(sendId, channel);
     }
@@ -16,7 +16,7 @@ public class UserChannelRel {
         return manager.get(sendId);
     }
 
-    private static HashMap<Channel, Integer> online = new HashMap<>();
+    private static final HashMap<Channel, Integer> online = new HashMap<>();
     public static void put2(Channel channel, Integer sendId){
         online.put(channel, sendId);
     }

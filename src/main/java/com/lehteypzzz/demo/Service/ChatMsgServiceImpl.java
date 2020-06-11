@@ -14,9 +14,8 @@ public class ChatMsgServiceImpl {
         this.chatMsgDao = chatMsgDao;
     }
 
-    public Integer saveMsg(ChatMsg chatMsg) {
-        ChatMsg chatMsgNew = chatMsgDao.save(chatMsg);
-        return chatMsgNew.getMsgId();
+    public void saveMsg(ChatMsg chatMsg) {
+        chatMsgDao.save(chatMsg);
     }
 
     public List<ChatMsg> getSingleChatHistory(Integer userId, Integer friendId, Integer type){

@@ -20,7 +20,7 @@ public class NettyStarter {
 		return SingletionNettyStarter.instance;
 	}
 
-	private ServerBootstrap server;
+	private final ServerBootstrap server;
 
 	public NettyStarter(){
 		EventLoopGroup mainGroup = new NioEventLoopGroup();

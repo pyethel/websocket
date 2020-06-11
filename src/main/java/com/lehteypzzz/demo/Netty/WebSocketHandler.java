@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
-    private static ChannelGroup users = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    private static final ChannelGroup users = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     // 文本信息处理
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {

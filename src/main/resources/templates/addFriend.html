@@ -58,12 +58,8 @@
             </div>
         </div>
 
-<!--        <div class="media mt-3">-->
-<!--            <img class="mr-4 ml-4 friend_pic" alt="image" src="images/3.jpg">-->
-<!--            <div class="media-body mr-4">-->
-<!--                <h6 class="mt-1 mb-2">userName</h6>-->
-<!--            </div>-->
-<!--        </div>-->
+        <div id="friendList">
+        </div>
 
     </div>
 </div>
@@ -83,7 +79,8 @@
                 friendName: friendName
             },
             success: function(data){
-                var friend = $("#main-body");
+                var friend = $("#friendList");
+                friend.html("");
                 for(var i=0; i<data.length;i++){
                     var friendHtml =
                         "<div class=\"media mt-3\">\n" +

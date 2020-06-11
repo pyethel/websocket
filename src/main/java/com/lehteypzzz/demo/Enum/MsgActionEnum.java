@@ -1,7 +1,7 @@
 package com.lehteypzzz.demo.Enum;
 
 public enum MsgActionEnum {
-    CONNECT(1, "第一次初始化量连接"),
+    CONNECT(1, "第一次初始化连接"),
     CHAT(2, "聊天消息");
 
     public final Integer type;
